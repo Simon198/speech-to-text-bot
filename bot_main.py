@@ -6,6 +6,10 @@ import os
 
 dir_path = os.path.abspath(os.path.dirname(__file__))
 
+class EmptyStringException(Exception):
+    def __str__(self):
+        return 'Keine Sprache bemerkt'
+
 def audio(update: Update, context: CallbackContext):
     try:
         ogg_path = dir_path + '/tmp.ogg'
@@ -15,6 +19,8 @@ def audio(update: Update, context: CallbackContext):
         file.download(ogg_path)
         convert_ogg_to_wav(ogg_path, wav_path)
         result = speech_to_text(wav_path)
+        if len(result) == 0:
+            raise EmptyStringException()
         update.message.reply_text(result)
         
     except Exception as err:
