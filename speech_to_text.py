@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from __future__ import absolute_import, division, print_function
+from __future__ import absolute_import, division
 
 import argparse
 import numpy as np
@@ -49,32 +49,17 @@ def convert_samplerate(audio_path, desired_sample_rate):
 
     return desired_sample_rate, np.frombuffer(output, np.int16)
 
-def speech_to_text(audio):
-    try:
-        fin = wave.open(audio, 'rb')
-        fs_orig = fin.getframerate()
-        if fs_orig != desired_sample_rate:
-            print('Warning: original sample rate ({}) is different than {}hz. Resampling might produce erratic speech recognition.'.format(fs_orig, desired_sample_rate), file=sys.stderr)
-            _, audio = convert_samplerate(audio, desired_sample_rate)
-        else:
-            audio = np.frombuffer(fin.readframes(fin.getnframes()), np.int16)
+def speech_to_text(audio_path):
+    fin = wave.open(audio_path, 'rb')
+    fs_orig = fin.getframerate()
+    if fs_orig != desired_sample_rate:
+        _, audio = convert_samplerate(audio_path, desired_sample_rate)
+    else:
+        audio = np.frombuffer(fin.readframes(fin.getnframes()), np.int16)
 
-        audio_length = fin.getnframes() * (1/fs_orig)
-        fin.close()
-
-        print('Running inference.', file=sys.stderr)
-        inference_start = timer()
-        # sphinx-doc: python_ref_inference_start
-        
-        result = ds.stt(audio)
-
-        # sphinx-doc: python_ref_inference_stop
-        inference_end = timer() - inference_start
-        print('Inference took %0.3fs for %0.3fs audio file.' % (inference_end, audio_length), file=sys.stderr)
-
-        return result
-    except Exception as error:
-        return str(error)
+    fin.close()    
+    result = ds.stt(audio)
+    return result
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Running DeepSpeech inference.')
