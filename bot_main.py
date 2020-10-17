@@ -10,6 +10,13 @@ class EmptyStringException(Exception):
     def __str__(self):
         return 'Keine Sprache bemerkt'
 
+def start(update: Update, context: CallbackContext):
+    description = (
+        'Der Bot akzeptiert Sprachnachrichten und wandelt sie in Text um. ' +
+        'Den Code findest du unter https://github.com/Simon198/speech-to-text-bot'
+    )
+    update.message.reply_text(description)
+
 def audio(update: Update, context: CallbackContext):
     try:
         ogg_path = dir_path + '/tmp.ogg'
@@ -21,7 +28,12 @@ def audio(update: Update, context: CallbackContext):
         result = speech_to_text(wav_path)
         if len(result) == 0:
             raise EmptyStringException()
-        update.message.reply_text(result)
+
+        update.message.reply_text(
+            str(update.message.from_user.first_name) +
+            ' sagt:\n' +
+            result
+        )
         
     except Exception as err:
         update.message.reply_text('Ein Fehler ist aufgetreten:\n' + str(err))
@@ -32,6 +44,7 @@ def main ():
     updater = Updater(token, use_context=True)
     dp = updater.dispatcher
     dp.add_handler(MessageHandler(Filters.voice, audio))
+    dp.add_handler(CommandHandler('start', start))
     updater.start_polling()
     updater.idle()
 
