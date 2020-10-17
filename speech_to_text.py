@@ -1,8 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, division
-
-import argparse
 import numpy as np
 import shlex
 import subprocess
@@ -62,6 +57,7 @@ def speech_to_text(audio_path):
     return result
 
 if __name__ == '__main__':
+    import argparse
     parser = argparse.ArgumentParser(description='Running DeepSpeech inference.')
     parser.add_argument('--audio', required=False,
                         help='Path to the audio file to run (WAV format)', default='audio_2020-10-16_18-23-33.wav')

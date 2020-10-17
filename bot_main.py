@@ -27,7 +27,7 @@ def audio(update: Update, context: CallbackContext):
         update.message.reply_text('Ein Fehler ist aufgetreten:\n' + str(err))
 
 def main ():
-    with open('TOKEN.txt', 'r') as file:
+    with open(dir_path + '/TOKEN.txt', 'r') as file:
         token = file.read()
     updater = Updater(token, use_context=True)
     dp = updater.dispatcher
